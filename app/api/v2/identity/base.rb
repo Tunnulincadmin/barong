@@ -22,7 +22,7 @@ module API::V2
       rescue_from(Grape::Exceptions::ValidationErrors) do |error|
         error!(error.message, 400)
       end
-      
+
       rescue_from(JWT::DecodeError) do |error|
         error!("Failed to decode and verify JWT", 403)
       end
