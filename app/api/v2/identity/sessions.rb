@@ -123,6 +123,7 @@ module API::V2
             else
               error!('Invalid Session', 401) unless session[:uid]
               user = User.find_by!(uid: session[:uid])
+              error!('Invalid Session', 401) unless user.active?
               header 'Authorization', 'Bearer ' + codec.encode(user.as_payload)
               return status(200)
             end
