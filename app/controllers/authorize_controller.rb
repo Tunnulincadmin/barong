@@ -12,7 +12,7 @@ class AuthorizeController < ActionController::Metal
     return access_error!('permission_denied', 401) if req.restricted?('block')
 
     response.status = 200
-    p 'kek1111111111111111111111111'
+    p 'kek1111'
     return if req.restricted?('pass')
 
     response.headers['Authorization'] = req.auth

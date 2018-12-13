@@ -12,17 +12,17 @@ module Barong
     end
 
     def auth
-      p 'HERE'
       auth_type = 'session'
       auth_type = 'apiKey' if apikey_headers?
-      p auth_type
-      'Bearer ' + codec.encode("#{auth_type}_owner".as_payload)
+      auth_owner = method("#{auth_type}_owner").call
+      'Bearer ' + codec.encode(auth_owner.as_payload)
     end
 
     def session_owner
-      # error!('Invalid Session', 401) unless session[:uid]
+      error!('Invalid Session', 401) unless session[:uid]
       user = User.find_by!(uid: session[:uid])
-      # error!('Invalid Session', 401) unless user.active?
+      error!('Invalid Session', 401) unless user.active?
+      user
     end
 
     def apiKey_owner
