@@ -225,4 +225,79 @@ describe API::V2::Identity::Users do
       end
     end
   end
+
+  describe 'PUT /api/v2/identity/users/password' do
+    let!(:old_password) { Faker::Internet.password(10, 20, true, false) }
+
+    let(:user) do
+      create(:user, password: old_password, password_confirmation: old_password)
+    end
+
+    let(:new_password) { Faker::Internet.password(10, 20, true, false) }
+
+    let(:params) do
+      {
+        email: user.email,
+        old_password: old_password,
+        new_password: new_password
+      }
+    end
+
+    let(:do_request) do
+      put '/api/v2/identity/users/password', params: params
+    end
+
+    context 'when old password given is correct' do
+      context 'when new password given passes validations' do
+
+        it 'changes_password' do
+          do_request
+          expect_status_to_eq 201
+
+          post '/api/v2/identity/sessions', params: {
+            email: user.email,
+            password: new_password
+          }
+          expect_status_to_eq 200
+        end
+      end
+
+      context 'when new password does not meet validations' do
+        let(:new_password) { Faker::Internet.password(5, 10, true, false) }
+
+        it 'returns an error' do
+          do_request
+          expect_status_to_eq 422
+        end
+
+      end
+    end
+
+    context 'when old password given is incorrect' do
+
+      it 'returns an error' do
+        put '/api/v2/identity/users/password', params: {
+          email: user.email,
+          old_password: new_password,
+          new_password: new_password
+        }
+        expect_status_to_eq 401
+      end
+
+    end
+
+    context 'when wrong email is given' do
+      let(:random_email) { Faker::Internet.free_email }
+
+      it 'returns an error' do
+        put '/api/v2/identity/users/password', params: {
+          email: random_email,
+          old_password: new_password,
+          new_password: new_password
+        }
+        expect_status_to_eq 404
+      end
+
+    end
+  end
 end

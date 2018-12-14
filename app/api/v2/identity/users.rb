@@ -151,6 +151,30 @@ module API::V2
             EventAPI.notify('system.user.password.reset', current_user.as_json_for_event_api)
             status 201
           end
+
+          desc 'Change password' do
+            success { code: 201, message: 'Changed' },
+            failure [
+              [ 401, 'Unauthorized' ],
+              [ 422, 'Unprocessable Entity' ],
+              [ 404, 'Not found' ]
+            ]
+          end
+
+          params do
+            requires :email, type: String,
+                             desc: 'User email',
+                             allow_blank: false
+            requires :old_password, type: String,
+                                    desc: 'Old password',
+                                    allow_blank: false
+            requires :new_password, type: String,
+                                    desc: 'New password',
+                                    allow_blank: false
+          end
+
+          put do
+          end
         end
       end
     end
